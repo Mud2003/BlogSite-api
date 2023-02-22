@@ -6,7 +6,7 @@ const User = require('./models/User');
 const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
-//const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 //const multer = require('multer');
 //const uploadMiddleware = multer({ dest: 'uploads/' });
 //const fs = require('fs');
@@ -16,7 +16,7 @@ const secret = 'asdfe45we45w345wegw345werjktjwertkj';
 
 app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 app.use(express.json());
-//app.use(cookieParser());
+app.use(cookieParser());
 //app.use('/uploads', express.static(__dirname + '/uploads'));
 
 mongoose.connect('mongodb+srv://muditha:FxJg8C0h2j2AFzl0@cluster0.mnc1whi.mongodb.net/?retryWrites=true&w=majority')
@@ -51,6 +51,18 @@ app.post('/login', async (req,res) => {
       res.status(400).json('wrong credentials');
     }
   });
+
+  app.get('/profile', (req,res) => {
+    const {token} = req.cookies;
+    jwt.verify(token, secret, {}, (err,info) => {
+      if (err) throw err;
+      res.json(info);
+    })
+  });
+
+  app.post('/logout', (req,res) => {
+    res.cookie('token', '').json('ok');
+  })
 
 app.listen(4000);
 
